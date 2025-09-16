@@ -1,38 +1,83 @@
-# Vibe: Vision Transformer for Interface Beauty Evaluation
+# 🎨 Vibe: Vision transformer for Interface Beauty Evaluation
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-1.12+-orange.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/glibas/Vibe/blob/main/notebooks/QuickStart.ipynb)
 
-A comprehensive deep learning framework for predicting web interface aesthetics using **saliency-guided Vision Transformers** with **multi-scale ROI selection**. Vibe provides state-of-the-art models for automated interface beauty evaluation, supporting multiple beauty aspects and design principles assessment.
+**VIBE** (**V**ision transformer for **I**nterface **B**eauty **E**valuation) is a comprehensive deep learning framework for **predicting web interface aesthetics using saliency-guided Vision Transformers with multi-scale ROI selection**. 
+
+Built with modular components optimized for Google Colab, Vibe leverages advanced techniques including:
+- 🎯 **Charm-enhanced patch selection** with saliency guidance
+- 🔍 **SUM-based saliency map generation** for attention focus
+- 📐 **Web ROI (Region of Interest) detection** for interface components
+- 🧠 **Multi-scale Vision Transformers** for comprehensive beauty assessment
 
 ## 🌟 Features
 
-- **Multiple Model Architectures**:
+- **🎯 Advanced Patch Selection**:
+  - [Charm approach](https://github.com/FBehrad/Charm) enhanced with saliency guidance
+  - Intelligent patch sampling for optimal feature extraction
+  - Multi-scale analysis for comprehensive interface understanding
+
+- **🔍 Saliency-Guided Processing**:
+  - [SUM (Saliency for User's Attention)](https://github.com/Arhosseini77/SUM) integration
+  - Visual attention maps to focus on interface hotspots
+  - Web ROI enhancement for interface-specific regions
+
+- **🧠 Multiple Model Architectures**:
   - Basic Vision Transformer for interface analysis
   - Saliency-guided ViT with attention to visual importance
   - ROI-enhanced ViT with multi-scale region selection
 
-- **Comprehensive Beauty Analysis**:
-  - Overall beauty score prediction
+- **📊 Comprehensive Beauty Analysis**:
+  - Overall beauty score prediction (0-1 scale)
   - Beauty aspects evaluation (color, layout, typography, balance)
   - Design principles assessment (symmetry, contrast, hierarchy, alignment, whitespace)
 
-- **Advanced Techniques**:
-  - Saliency-guided attention mechanisms
-  - Multi-scale ROI detection and selection
-  - Beauty-specific token embeddings
-  - Multi-task learning with consistency constraints
-
-- **Production-Ready**:
-  - Easy-to-use CLI interface
-  - Comprehensive evaluation metrics
-  - Visualization tools for attention and saliency
-  - Flexible configuration system
+- **🛠️ Google Colab Optimized**:
+  - Modular notebook components for easy experimentation
+  - GPU-accelerated training and inference
+  - Seamless Google Drive dataset integration
+  - Pre-configured environments for immediate use
 
 ## 🚀 Quick Start
 
-### Installation
+### 📓 Google Colab (Recommended)
+
+Get started immediately with our pre-configured notebooks:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/glibas/Vibe/blob/main/notebooks/QuickStart.ipynb)
+
+```python
+# In Google Colab
+!git clone https://github.com/glibas/Vibe.git
+%cd Vibe
+!pip install -q -r requirements.txt
+```
+
+**Dataset Setup in Colab:**
+```python
+from google.colab import drive
+import shutil, zipfile, os
+
+# Mount Google Drive
+drive.mount('/content/drive')
+
+# Load WebDesignPrototypicality dataset
+zip_path = '/content/drive/MyDrive/datasets/webdesignprototypicality.zip'
+local_zip = '/content/webdesignprototypicality.zip'
+extract_dir = '/content/webdesignprototypicality'
+
+if not os.path.exists(extract_dir):
+    shutil.copy(zip_path, local_zip)
+    os.makedirs(extract_dir, exist_ok=True)
+    with zipfile.ZipFile(local_zip, 'r') as zip_ref:
+        zip_ref.extractall(extract_dir)
+    print("Data extracted to:", extract_dir)
+```
+
+### 💻 Local Installation
 
 ```bash
 # Clone the repository
@@ -89,8 +134,13 @@ vibe-predict --image-path ./sample_data/images/interface_001.png --model-path ./
 
 ### Data Format
 
-The framework expects data in the following format:
+Vibe supports multiple dataset formats, with primary support for the **WebDesignPrototypicality** dataset:
 
+**📖 Supported Datasets:**
+- [WebDesignPrototypicality Dataset](https://www.sciencedirect.com/science/article/pii/S2352340923010077) - Primary dataset for training and evaluation
+- Custom interface datasets with beauty annotations
+
+**📁 Expected Directory Structure:**
 ```
 data/
 ├── images/
@@ -100,11 +150,22 @@ data/
 └── annotations.csv
 ```
 
-**Annotations CSV format**:
+**📊 Annotations CSV Format:**
 ```csv
 image_path,beauty_score,color_score,layout_score,typography_score,balance_score,symmetry_score,contrast_score,hierarchy_score,alignment_score,whitespace_score
 images/interface_001.png,0.85,0.8,0.9,0.7,0.8,0.75,0.85,0.8,0.9,0.7
 images/interface_002.png,0.62,0.6,0.7,0.5,0.6,0.65,0.7,0.6,0.7,0.5
+```
+
+**🔄 Google Colab Dataset Loading:**
+```python
+from vibe.data.colab_utils import load_webdesign_dataset
+
+# Automatic dataset setup in Colab
+dataset_path = load_webdesign_dataset(
+    drive_path='/content/drive/MyDrive/datasets/webdesignprototypicality.zip',
+    extract_to='/content/webdesignprototypicality'
+)
 ```
 
 ### Configuration
@@ -252,6 +313,34 @@ print(f"Design Principles: {analysis['design_principles']}")
 print(f"\nExplanation:\n{explanation}")
 ```
 
+## 📚 Google Colab Notebooks
+
+Vibe includes comprehensive Jupyter notebooks optimized for Google Colab:
+
+| Notebook | Description | Link |
+|----------|-------------|------|
+| **QuickStart.ipynb** | Get started with Vibe in under 5 minutes | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/glibas/Vibe/blob/main/notebooks/QuickStart.ipynb) |
+| **TrainingNotebook.ipynb** | Complete training pipeline with GPU acceleration | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/glibas/Vibe/blob/main/notebooks/TrainingNotebook.ipynb) |
+| **EvaluationNotebook.ipynb** | Comprehensive model evaluation and metrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/glibas/Vibe/blob/main/notebooks/EvaluationNotebook.ipynb) |
+
+### 🗂️ Modular Components
+
+Each notebook uses modular Vibe components that can be easily adapted:
+
+```python
+# Dataset loading module
+from vibe.data.colab_utils import load_webdesign_dataset, quick_setup
+
+# Model creation module  
+from vibe.models import BeautyPredictor
+
+# Training module
+from vibe.training import BeautyTrainer, BeautyLoss
+
+# Evaluation module
+from vibe.evaluation import InterfaceEvaluator
+```
+
 ## 📊 Evaluation Metrics
 
 Vibe provides comprehensive evaluation metrics:
@@ -327,10 +416,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Acknowledgments
 
-- Vision Transformer architecture based on "An Image is Worth 16x16 Words"
-- Saliency guidance inspired by visual attention research
-- ROI selection techniques adapted from object detection literature
-- Interface beauty evaluation metrics from HCI and design research
+- **Vision Transformer**: Based on "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
+- **Charm Approach**: Enhanced patch selection using [FBehrad/Charm](https://github.com/FBehrad/Charm)
+- **SUM Saliency**: Saliency maps generated using [Arhosseini77/SUM](https://github.com/Arhosseini77/SUM)
+- **WebDesignPrototypicality Dataset**: [Todi et al. 2023](https://www.sciencedirect.com/science/article/pii/S2352340923010077)
+- **Interface beauty evaluation**: Metrics from HCI and design research
+- **ROI selection**: Techniques adapted from object detection and web analysis literature
 
 ## 📞 Contact
 
