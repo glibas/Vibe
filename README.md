@@ -1,2 +1,2 @@
 # Vibe
-Vision transformer for Interface Beauty Evaluation
+**V**ision transformer for **I**nterface **B**eauty **E**valuation
