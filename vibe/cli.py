@@ -17,7 +17,7 @@ from vibe.data import InterfaceDataLoader, create_sample_dataset
 from vibe.training import BeautyTrainer, BeautyLoss, create_optimizer, create_scheduler
 from vibe.evaluation import InterfaceEvaluator
 from vibe.config import ConfigManager, create_default_config
-from vibe.utils import setup_logging, model_logger, eval_logger
+from vibe.utils import setup_logging
 
 
 @click.group()
@@ -184,7 +184,7 @@ def train(config, data_path, annotations, val_data_path, val_annotations,
         logger.info(f"Resumed training from {resume}")
     
     # Start training
-    model_logger.log_training_start(config_dict)
+    logger.info("Starting training...")
     trainer.train(training_config.num_epochs)
     
     logger.info("Training completed!")
@@ -241,9 +241,14 @@ def evaluate(model_path, data_path, annotations, output_dir, batch_size, device,
     os.makedirs(output_dir, exist_ok=True)
     
     # Run evaluation
-    eval_logger.log_evaluation_start("test_set", len(test_loader.dataset))
+    logger.info(f"Starting evaluation on test set ({len(test_loader.dataset)} samples)")
     results = evaluator.evaluate_dataset(test_loader, output_dir)
-    eval_logger.log_evaluation_results(results)
+    
+    # Log results
+    logger.info("Evaluation Results:")
+    logger.info(f"RMSE: {results['overall']['rmse']:.4f}")
+    logger.info(f"MAE: {results['overall']['mae']:.4f}")
+    logger.info(f"Pearson: {results['overall']['pearson']:.4f}")
     
     # Run detailed analysis on sample images
     if analysis_samples > 0:

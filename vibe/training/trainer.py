@@ -5,13 +5,22 @@ Training pipeline for interface beauty evaluation models.
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 import os
 from typing import Dict, List, Optional, Tuple
-from tqdm import tqdm
 import json
 import time
+
+# Handle optional tensorboard import
+try:
+    from torch.utils.tensorboard import SummaryWriter
+except ImportError:
+    SummaryWriter = None
+
+try:
+    from tqdm import tqdm
+except ImportError:
+    from ..utils.fallbacks import tqdm
 
 from ..models import BeautyPredictor
 from ..evaluation import InterfaceEvaluator
@@ -160,7 +169,7 @@ class BeautyTrainer:
         os.makedirs(save_dir, exist_ok=True)
         self.log_dir = log_dir
         self.save_dir = save_dir
-        self.writer = SummaryWriter(log_dir)
+        self.writer = SummaryWriter(log_dir) if SummaryWriter else None
         
         # Training state
         self.epoch = 0
@@ -197,10 +206,11 @@ class BeautyTrainer:
             self.training_history['learning_rate'].append(
                 self.optimizer.param_groups[0]['lr']
             )
-            
-            self.writer.add_scalar('Loss/Train', train_loss, epoch)
-            self.writer.add_scalar('Learning_Rate', 
-                                 self.optimizer.param_groups[0]['lr'], epoch)
+
+            if self.writer:
+                self.writer.add_scalar('Loss/Train', train_loss, epoch)
+                self.writer.add_scalar('Learning_Rate', 
+                                     self.optimizer.param_groups[0]['lr'], epoch)
             
             print(f"Epoch {epoch+1}/{num_epochs} - Train Loss: {train_loss:.4f}")
             
@@ -214,8 +224,9 @@ class BeautyTrainer:
                 self.training_history['val_loss'].append(val_loss)
                 self.training_history['val_pearson'].append(val_pearson)
                 
-                self.writer.add_scalar('Loss/Validation', val_loss, epoch)
-                self.writer.add_scalar('Metrics/Pearson', val_pearson, epoch)
+                if self.writer:
+                    self.writer.add_scalar('Loss/Validation', val_loss, epoch)
+                    self.writer.add_scalar('Metrics/Pearson', val_pearson, epoch)
                 
                 print(f"         Val Loss: {val_loss:.4f}, Val Pearson: {val_pearson:.4f}")
                 
@@ -241,7 +252,8 @@ class BeautyTrainer:
         self._save_training_history()
         
         print("Training completed!")
-        self.writer.close()
+        if self.writer:
+            self.writer.close()
     
     def _train_epoch(self):
         """Train for one epoch."""
